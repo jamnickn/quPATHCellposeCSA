@@ -1,0 +1,22 @@
+import qupath.ext.biop.cellpose.Cellpose2D
+def pathModel = "Cellpose trained model"
+def cellpose = Cellpose2D.builder( pathModel )
+.pixelSize( 0.5 ) // Resolution for detection in um
+.channels( 0 ) // Select detection channel(s)
+.normalizePercentilesGlobal(0.1, 99.8, 10) // Convenience global percentile
+normalization. arguments are percentileMin, percentileMax, dowsample.
+.cellprobThreshold(0.0) // Threshold for the mask detection, defaults to 0.0
+.flowThreshold(0.4) // Threshold for the flows, defaults to 0.4
+.diameter(150) // Median object diameter. Set to 0.0 for the `bact_omni`
+model or for automatic computation
+.measureShape() // Add shape measurements
+.measureIntensity() // Add cell measurements (in all compartments)
+.build()
+def imageData = getCurrentImageData()
+def pathObjects = getSelectedObjects()
+if (pathObjects.isEmpty()) {
+Dialogs.showErrorMessage(&quot;Cellpose&quot;, &quot;Please select a parent object!&quot;)
+return
+}
+cellpose.detectObjects(imageData, pathObjects)
+println &#39;Done!&#39;
